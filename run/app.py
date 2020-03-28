@@ -1,7 +1,7 @@
 from time import sleep
 
 from controllers.KafkaController import KafkaConsumerLocal, KafkaProducerLocal
-# from controllers.DatabaseController import
+from controllers.DatabaseController import database_insert
 
 
 INCOMING_DATA_STEAM_TOPIC = 'CodingAssignment'
@@ -15,7 +15,7 @@ class CodingAssignment:
     kafka_producer = None
     kafka_consumer = None
 
-    start_timer = None
+    first_timestamp = None
 
     # lists to store our nodes and values
     nodes = None
@@ -51,31 +51,26 @@ class CodingAssignment:
                 continue
 
             # Start our timer from the first timestamp received
-            if self.start_timer is None:
-                self.start_timer = timestamp
+            if self.first_timestamp is None:
+                self.first_timestamp = timestamp
 
             # send the data to be stored in our nodes and node_value lists
             self.add_node_and_value(node_id, value)
 
             # check if we've had greater then 60 seconds worth of data
             # if we have, send this data to our database to be stored
-            if timestamp >= self.start_timer + TIMER_ACTION:
-                print('We\' run for ' + str(TIMER_ACTION) + ' seconds')
+            if timestamp >= self.first_timestamp + TIMER_ACTION:
+                print('We\'ve run for ' + str(TIMER_ACTION) + ' seconds')
 
                 nodes_copy = self.nodes
                 node_values_copy = self.node_values
 
                 self.__write_to_database(nodes_copy, node_values_copy)
 
+                # remove the data we've now saved from our lists
+                # resets the time field
                 self.__reset_lists()
-                sleep(120)
-
-            # limit run to 1000 entries
-            # i = i + 1
-            # if i == 1000:
-            #     print(self.nodes)
-            #     print(self.node_values)
-            #     break
+                # sleep(120)
 
 
     def message_is_valid(self, message):
@@ -96,7 +91,6 @@ class CodingAssignment:
             raise ValueError
 
     def add_node_and_value(self, node_id, value):
-
         # if we haven't seen this node before, add it to the nodes list
         if node_id not in self.nodes:
             self.nodes.append(node_id)
@@ -115,16 +109,58 @@ class CodingAssignment:
         self.node_values[node_key].append(value)
 
     def __write_to_database(self, nodes_copy, node_values_copy):
-        print('Write to database')
-        print(len(node_values_copy[0]))
-        print(len(node_values_copy[1]))
-        print(len(node_values_copy[2]))
-        print(len(node_values_copy[3]))
+        print('Writing to database')
+
+        # get the count of nodes
+        nodes_copy_len = len(nodes_copy)
+        i = 0
+
+        while i < nodes_copy_len:
+            node_id = nodes_copy[i]
+            (count, minv, maxv, avgv) = self.get_min_max_avg_values(node_values_copy[i])
+            database_insert(node_id, count, minv, maxv, avgv)
+
+            i = i + 1
+
+        print('Finished Writing to Database')
+
+    def get_min_max_avg_values(self, list):
+        min_value = None
+        max_value = None
+        avg_value = None
+
+        count = 0
+        sum_of_values = 0
+
+        for value in list:
+            # for every value, increment the count and add to the sum_of_values
+            count = count + 1
+            sum_of_values = sum_of_values + value
+
+            # for the first value
+            if min_value is None:
+                min_value = value
+                max_value = value
+                continue
+
+            # if this value is smaller
+            if value < min_value:
+                min_value = value
+
+            # if thi value is larger
+            if value > max_value:
+                max_value = value
+
+        # get the average by dividing sum_of_values by count
+        avg_value = sum_of_values / count
+
+        # return as a tuple
+        return count, min_value, max_value, avg_value
 
     def __reset_lists(self):
         self.nodes = []
         self.node_values = []
-        self.start_timer = None
+        self.first_timestamp = None
 
 
 if __name__ == "__main__":

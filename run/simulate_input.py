@@ -3,7 +3,7 @@ from datetime import datetime
 
 from controllers.KafkaController import KafkaProducerLocal
 
-OUTGOING_DATA_STEAM_TOPIC = 'CodingAssignment'
+OUTGOING_DATA_STREAM_TOPIC = 'CodingAssignment'
 
 # Simulate a list of Node IDs
 example_nodes = [
@@ -37,7 +37,7 @@ while loop:
     random_node = random.randint(0, len(example_nodes) -1)
 
     # generate a random value
-    random_value = random.randint(0, 100)
+    random_value = random.randint(0, 1000000)
 
     # convert the timestamp into an int to remove the milliseconds
     timestamp = int(datetime.now().timestamp())
@@ -54,7 +54,7 @@ while loop:
     try:
         # send this data to the Kafka Topic
         print('Sending')
-        producer.send(OUTGOING_DATA_STEAM_TOPIC, value=data)
+        producer.send(OUTGOING_DATA_STREAM_TOPIC, value=data)
     except:
         # If there is an exception thrown here, for now, silently ignore
         # TODO implement error handling here
