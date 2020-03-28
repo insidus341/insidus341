@@ -155,11 +155,13 @@ SHOW COLUMNS from NodeCheckIn;
 The easiest way to run this is with two console Windows open.
 You can find the IP address of Debian with `ip addr`. SSH into Debian from an SSH client (Putty) twice.
 
-To begin with, the stream will be empty. In one Window, run `python3 run/app.py`. The Window will remain blank as there's no data.
+To begin with, the stream will be empty. In one Window, run `python3 run/app.py`. The Window will remain as 'Starting...'
+as there's currently no data
 
-One the second console window, run `python3 run/simulate_input.py`. This will throw a bunch of messages onto the screan.
-These will appear on the first console window running app.py. As long as the messages from simulate_input
-are shown on the console for app.py we are reading the stream data.
+One the second console window, run `python3 run/simulate_input.py`. This will throw a bunch of messages onto the console
+window.
+The first console window will change to 'Analysing: x messages every 5 seconds' after 5 seconds. As long as the message 
+count increases, we are analyzing data
 
 Once this has been running for a few minutes the database will be populated. We can view the database
 by running: 
