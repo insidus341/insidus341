@@ -12,7 +12,7 @@ def database_insert(node_id, count, minv, maxv, avgv):
     try:
         (mariadb_connection, cursor) = database()
 
-        cursor.execute("insert into NodeCheckIn (Node_ID, Min_Value, Max_Value, Avg_Value) VALUES (%s, %s, %s, %s, %s)",
+        cursor.execute("insert into NodeCheckIn (Node_ID, Count, Min_Value, Max_Value, Avg_Value) VALUES (%s, %s, %s, %s, %s)",
                        (node_id, count, minv, maxv, avgv))
         mariadb_connection.commit()
         return True
