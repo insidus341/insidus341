@@ -8,7 +8,9 @@ import os
 INCOMING_DATA_STEAM_TOPIC = 'CodingAssignment'
 TIMER_ACTION = 60
 
-CLEAR_SCREEN = lambda: os.system('clear')
+def clear_screen():
+    clear = lambda: os.system('clear')
+    clear()
 
 
 class CodingAssignment:
@@ -32,7 +34,7 @@ class CodingAssignment:
 
         self.__reset_lists()
 
-        CLEAR_SCREEN()
+        clear_screen()
         print('Starting...')
 
         self.read_kafka_stream()
@@ -66,7 +68,7 @@ class CodingAssignment:
             # check if we've had greater then 60 seconds worth of data
             # if we have, send this data to our database to be stored
             if timestamp >= self.first_timestamp + TIMER_ACTION:
-                print('We\'ve run for ' + str(TIMER_ACTION) + ' seconds')
+                print('Analyzed ' + str(TIMER_ACTION) + ' seconds worth of data')
 
                 nodes_copy = self.nodes
                 node_values_copy = self.node_values
@@ -81,7 +83,7 @@ class CodingAssignment:
         current_timestamp = int(datetime.now().timestamp())
 
         if int(current_timestamp > self.five_second_timer + 5):
-            CLEAR_SCREEN()
+            clear_screen()
 
             print('Analysing: ' + str(self.message_count) + ' messages every 5 seconds')
 
