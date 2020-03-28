@@ -1,21 +1,24 @@
-from time import sleep
+from datetime import datetime
 
 from controllers.KafkaController import KafkaConsumerLocal, KafkaProducerLocal
 from controllers.DatabaseController import database_insert
+import os
 
 
 INCOMING_DATA_STEAM_TOPIC = 'CodingAssignment'
-
-# Every x seconds, send collate the data ready to sent to our database
 TIMER_ACTION = 60
+
+CLEAR_SCREEN = lambda: os.system('clear')
 
 
 class CodingAssignment:
-
     kafka_producer = None
     kafka_consumer = None
 
     first_timestamp = None
+    five_second_timer = None
+    message_count = 0
+    database_insert_count = 0
 
     # lists to store our nodes and values
     nodes = None
@@ -25,20 +28,23 @@ class CodingAssignment:
         self.kafka_producer = KafkaProducerLocal()
         self.kafka_consumer = KafkaConsumerLocal(INCOMING_DATA_STEAM_TOPIC)
 
+        self.five_second_timer = int(datetime.now().timestamp())
+
         self.__reset_lists()
+
+        CLEAR_SCREEN()
+        print('Starting...')
 
         self.read_kafka_stream()
 
     def read_kafka_stream(self):
-        message_count = 0
-
         # Do something for every message received on the Kafka Topic
-        i = 0
         for message in self.kafka_consumer:
 
             message = message.value
-            message_count = message_count + 1
-            print(message)
+            self.message_count = self.message_count + 1
+
+            self.messages_per_second()
 
             # Check if the massage matches our expected format
             # if not, skip this message
@@ -70,8 +76,21 @@ class CodingAssignment:
                 # remove the data we've now saved from our lists
                 # resets the time field
                 self.__reset_lists()
-                # sleep(120)
 
+    def messages_per_second(self):
+        current_timestamp = int(datetime.now().timestamp())
+
+        if int(current_timestamp > self.five_second_timer + 5):
+            CLEAR_SCREEN()
+
+            print('Analysing: ' + str(self.message_count) + ' messages every 5 seconds')
+
+            if self.database_insert_count is not 0:
+                print('Inserted: ' + str(self.database_insert_count) + ' rows into the Database')
+
+            # reset message_count and timer
+            self.five_second_timer = current_timestamp
+            self.message_count = 0
 
     def message_is_valid(self, message):
         # expected format: {'Node_ID': 12345678900001, 'Value': 30, 'Timestamp': 123452242}
@@ -113,12 +132,13 @@ class CodingAssignment:
 
         # get the count of nodes
         nodes_copy_len = len(nodes_copy)
-        i = 0
 
+        i = 0
         while i < nodes_copy_len:
             node_id = nodes_copy[i]
             (count, minv, maxv, avgv) = self.get_min_max_avg_values(node_values_copy[i])
             database_insert(node_id, count, minv, maxv, avgv)
+            self.database_insert_count = self.database_insert_count + 1
 
             i = i + 1
 
