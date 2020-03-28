@@ -1,0 +1,29 @@
+# To create the database and user
+
+CREATE database IF NOT EXISTS CodingAssignment;
+USE CodingAssignment;
+CREATE table IF NOT EXISTS NodeCheckIn(
+	ID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+	Node_ID BIGINT NOT NULL,
+	Count INT NOT NULL,
+	Min_Value INT NOT NULL,
+	Max_Value INT NOT NULL,
+	Avg_Value FLOAT NOT NULL,
+	Occured TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE USER node_user@localhost IDENTIFIED BY 'Pa55word123';
+GRANT permission ON CodingAssignment.NodeCheckIn TO 'node_user'@'localhost';
+GRANT INSERT, SELECT ON CodingAssignment.NodeCheckIn TO 'node_user'@'localhost';
+FLUSH PRIVILEGES;
+
+# Confirm that the user and table have been created
+
+USE CodingAssignment;
+SHOW GRANTS FOR 'node_user'@'localhost';
+SHOW COLUMNS from NodeCheckIn;
+
+# Select all data
+
+USE CodingAssignment;
+SELECT * FROM NodeCheckIn;
