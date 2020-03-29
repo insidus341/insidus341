@@ -150,6 +150,13 @@ USE CodingAssignment;
 SHOW COLUMNS from NodeCheckIn;
 ```
 
+## Tests
+Unit tests are being run by PyTest, you can run these from within the parent directory
+```
+sudo pip3 install -U pytest
+pytest tests/
+```
+
 ## Run
 
 The easiest way to run this is with two console Windows open.
@@ -158,10 +165,10 @@ You can find the IP address of Debian with `ip addr`. SSH into Debian from an SS
 To begin with, the stream will be empty. In one Window, run `python3 run/app.py`. The Window will remain as 'Starting...'
 as there's currently no data
 
-One the second console window, run `python3 run/simulate_input.py`. This will throw a bunch of messages onto the console
+On the second console window, run `python3 run/simulate_input.py`. This will throw a bunch of messages onto the console
 window.
-The first console window will change to 'Analysing: x messages every 5 seconds' after 5 seconds. As long as the message 
-count increases, we are analyzing data
+The first console window will change to 'Analysing: x messages every second'. As long as the message 
+count is shown we are analyzing data
 
 Once this has been running for a few minutes the database will be populated. We can view the database
 by running: 
@@ -183,7 +190,6 @@ MariaDB [CodingAssignment]> SELECT * FROM NodeCheckIn;
 |  25 | 12345678900002 |  4851 |       484 |    999948 |    500410 | 2020-03-28 18:44:42 |
 |  26 | 12345678900007 |  4797 |       158 |    999875 |    497256 | 2020-03-28 18:44:42 |
 +-----+----------------+-------+-----------+-----------+-----------+---------------------+
-
 ```
 
 ## Built With
@@ -191,6 +197,7 @@ MariaDB [CodingAssignment]> SELECT * FROM NodeCheckIn;
 * [Apache Kafka](https://kafka.apache.org/) - Distributed Streaming Platform
 * [MariaDC](https://mariadb.org/) - Open Source Relational Database
 * [MySQL Connector](https://dev.mysql.com/downloads/connector/python/) - Used by Python3 for Database Access
+* [PyTest](https://pytest.org/en/latest/) - A Python testing framework
 
 ## Authors
 
