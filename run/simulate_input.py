@@ -43,21 +43,20 @@ while loop:
     timestamp = int(datetime.now().timestamp())
 
     # collect the data to send
-    data = {
+    message = {
         'Node_ID': example_nodes[random_node],
         'Value': random_value,
         'Timestamp': timestamp
     }
 
-    print(data)
+    print(message)
 
     try:
         # send this data to the Kafka Topic
         print('Sending')
-        producer.send(OUTGOING_DATA_STREAM_TOPIC, value=data)
+        producer.send(OUTGOING_DATA_STREAM_TOPIC, value=message)
     except:
         # If there is an exception thrown here, for now, silently ignore
-        # TODO implement error handling here
-        print('Send failed')
+        print('Failed to send a message')
         continue
 
