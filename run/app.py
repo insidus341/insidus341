@@ -46,52 +46,62 @@ class CodingAssignment:
 
     def read_kafka_stream(self):
         # Do something for every message received on the Kafka Topic
-        for message in self.kafka_consumer:
-            message = message.value
-            node_id = None
-            value = None
-            timestamp = None
+        # we need to wrap this in a try, if the message format is incorrect, this will fail
+        try:
+            for message in self.kafka_consumer:
+                message = message.value
 
-            # Check if the massage matches our expected format
-            # if not, skip this message
-            # We want to silently fail if a message cannot be read so the service does not fail
-            # The failure could be written to a log, or a Kafka topic for further analysis
-            try:
-                (node_id, value, timestamp) = message_is_valid(message)
-            except ValueError as e:
-                print('A value was incorrect')
-                print(e)
-                continue
+                self.process_message(message)
+        except Exception as e:
+            print(e)
+            # TODO send this error to a file
 
-            except Exception as e:
-                print('We hit an error')
-                print(e)
-                continue
+        finally:
+            self.read_kafka_stream()
 
-            # used to count how many messages we process every 5 seconds
-            self.message_count = self.message_count + 1
-            self.messages_per_one_second()
+    def process_message(self, message):
+        node_id = None
+        value = None
+        timestamp = None
 
-            # Start our timer from the first timestamp received
-            if self.first_timestamp is None:
-                self.first_timestamp = timestamp
+        # Check if the massage matches our expected format
+        # if not, skip this message
+        # We want to silently fail if a message cannot be read so the service does not fail
+        # The failure could be written to a log TODO Write error to log
+        try:
+            (node_id, value, timestamp) = message_is_valid(message)
+        except ValueError as e:
+            print('A value was incorrect')
+            print(e)
 
-            # send the data to be stored in our nodes and node_value lists
-            (self.nodes, self.node_values) = add_node_and_value(node_id, value, self.nodes, self.node_values)
+        except Exception as e:
+            print('We hit an error')
+            print(e)
 
-            # check if we've had greater then 60 seconds worth of data
-            # if we have, send this data to our database to be stored
-            if timestamp >= self.first_timestamp + TIMER_ACTION:
-                print('Analyzed ' + str(TIMER_ACTION) + ' seconds worth of data')
+        # used to count how many messages we process every 5 seconds
+        self.message_count = self.message_count + 1
+        self.messages_per_one_second()
 
-                nodes_copy = self.nodes
-                node_values_copy = self.node_values
+        # Start our timer from the first timestamp received
+        if self.first_timestamp is None:
+            self.first_timestamp = timestamp
 
-                self.__write_to_database(nodes_copy, node_values_copy)
+        # send the data to be stored in our nodes and node_value lists
+        (self.nodes, self.node_values) = add_node_and_value(node_id, value, self.nodes, self.node_values)
 
-                # remove the data we've now saved from our lists
-                # resets the time field
-                self.__reset_lists()
+        # check if we've had greater then 60 seconds worth of data
+        # if we have, send this data to our database to be stored
+        if timestamp >= self.first_timestamp + TIMER_ACTION:
+            print('Analyzed ' + str(TIMER_ACTION) + ' seconds worth of data')
+
+            nodes_copy = self.nodes
+            node_values_copy = self.node_values
+
+            self.__write_to_database(nodes_copy, node_values_copy)
+
+            # remove the data we've now saved from our lists
+            # resets the time field
+            self.__reset_lists()
 
     def messages_per_one_second(self):
         current_timestamp = int(datetime.now().timestamp())
