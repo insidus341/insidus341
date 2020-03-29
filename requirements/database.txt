@@ -12,8 +12,7 @@ CREATE table IF NOT EXISTS NodeCheckIn(
 	Occured TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE USER node_user@localhost IDENTIFIED BY 'Pa55word123';
-GRANT permission ON CodingAssignment.NodeCheckIn TO 'node_user'@'localhost';
+CREATE USER IF NOT EXISTS node_user@localhost IDENTIFIED BY 'Pa55word123';
 GRANT INSERT, SELECT ON CodingAssignment.NodeCheckIn TO 'node_user'@'localhost';
 FLUSH PRIVILEGES;
 

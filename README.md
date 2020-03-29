@@ -39,8 +39,8 @@ To install Java JRE and JDK
 https://www.digitalocean.com/community/tutorials/how-to-install-java-with-apt-on-debian-10#installing-the-default-jrejdk
 
 ```
-sudo apt update
-sudo install default-jre default-jdk
+sudo apt-get update
+sudo apt-get install default-jre default-jdk
 ```
 
 To install Python3
@@ -119,7 +119,7 @@ Create the Kafka Topic
 
 #### Pull the project from Github
 ```
-https://codeload.github.com/insidus341/James-Earl---Coding-Assignment/zip/master
+wget https://codeload.github.com/insidus341/James-Earl---Coding-Assignment/zip/master
 
  - if unzip is not installed: sudo apt-get install unzip
 unzip master
@@ -133,7 +133,7 @@ pip3 install -r requirements/requirements.txt
 
 Create the Database, Table and User
 ```
-sudo mysql -u root -p < database.txt
+sudo mysql -u root -p < requirements/database.txt
 ```
 
 #### Setup Confirmation
@@ -205,7 +205,7 @@ MariaDB [CodingAssignment]> SELECT * FROM NodeCheckIn;
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE.md](https://github.com/insidus341/James-Earl---Coding-Assignment/blob/master/LICENSE) file for details
 
 ## Acknowledgments
 
