@@ -153,6 +153,7 @@ SHOW COLUMNS from NodeCheckIn;
 ## Tests
 Unit tests are being run by PyTest, you can run these from within the parent directory
 ```
+sudo pip3 install -U pytest
 pytest tests/
 ```
 
