@@ -47,17 +47,9 @@ class CodingAssignment:
     def read_kafka_stream(self):
         # Do something for every message received on the Kafka Topic
         # we need to wrap this in a try, if the message format is incorrect, this will fail
-        try:
-            for message in self.kafka_consumer:
-                message = message.value
-
-                self.process_message(message)
-        except Exception as e:
-            print(e)
-            # TODO send this error to a file
-
-        finally:
-            self.read_kafka_stream()
+        for message in self.kafka_consumer:
+            message = message.value
+            self.process_message(message)
 
     def process_message(self, message):
         node_id = None
